@@ -60,4 +60,22 @@ public class JsonHelper {
 		return null;
 	}
 	
+	/**
+	 * json转换对象 可以转换泛型
+	 * @param json
+	 * @param cla
+	 * @param parameterClasses
+	 * @return
+	 */
+	public static <T> T transJsonStringToObj(String json, Class<T> cla,Class<?>... parameterClasses) {
+		try {
+			mapper.getTypeFactory().constructParametrizedType(cla, cla, parameterClasses);
+			T t = mapper.readValue(json, cla);
+			return t;
+		} catch (IOException e) {
+			LOGGER.error("json转换失败,原因:{},cause:{}",e.getMessage(),e.getCause());
+		}
+		return null;
+	}
+	
 }
