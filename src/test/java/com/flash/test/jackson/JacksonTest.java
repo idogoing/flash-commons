@@ -1,9 +1,7 @@
 package com.flash.test.jackson;
 
-import java.io.IOException;import javax.jws.soap.SOAPBinding.Use;
+import java.io.IOException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JacksonTest {

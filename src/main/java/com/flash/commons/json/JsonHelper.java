@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -69,8 +70,8 @@ public class JsonHelper {
 	 */
 	public static <T> T transJsonStringToObj(String json, Class<T> cla,Class<?>... parameterClasses) {
 		try {
-			mapper.getTypeFactory().constructParametrizedType(cla, cla, parameterClasses);
-			T t = mapper.readValue(json, cla);
+			JavaType type = mapper.getTypeFactory().constructParametrizedType(cla, cla, parameterClasses);
+			T t = mapper.readValue(json, type);
 			return t;
 		} catch (IOException e) {
 			LOGGER.error("json转换失败,原因:{},cause:{}",e.getMessage(),e.getCause());
