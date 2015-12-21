@@ -13,35 +13,38 @@ import org.springframework.util.Assert;
 
 public class BeanAndDtoTransfer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BeanAndDtoTransfer.class);
+
 	/**
 	 * 将dto转换为Bean
+	 * 
 	 * @author lonaking
 	 * @param dto
 	 * @param cla
 	 * @deprecated 请使用新的方法@see transOneToAnoter
 	 * @return
 	 */
-	public static <D, B> B PutDtoIntoBean(D dto , Class<B> cla){
-			B bean;
-			try {
-				bean = cla.newInstance();
-				BeanUtils.copyProperties(dto, bean);
-				return bean;
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	public static <D, B> B PutDtoIntoBean(D dto, Class<B> cla) {
+		B bean;
+		try {
+			bean = cla.newInstance();
+			BeanUtils.copyProperties(dto, bean);
+			return bean;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
 	/**
 	 * 将Bean转换为Dto
+	 * 
 	 * @author lonaking
 	 * @param bean
 	 * @param cla
 	 * @deprecated 请使用新的方法@see transOneToAnoter
 	 * @return
 	 */
-	public static <B, D> D putBeanIntoDto(B bean, Class<D> cla){
+	public static <B, D> D putBeanIntoDto(B bean, Class<D> cla) {
 		try {
 			D dto = cla.newInstance();
 			BeanUtils.copyProperties(bean, dto);
@@ -54,12 +57,15 @@ public class BeanAndDtoTransfer {
 
 	/**
 	 * 将一个Bean(或者dto)的列表中的所有元素复制到另一哥Dto(或者bean)的列表中
+	 * 
 	 * @author lonaking
-	 * @param one 一个已知列表
-	 * @param cla 要复制到的列表的类型
+	 * @param one
+	 *            一个已知列表
+	 * @param cla
+	 *            要复制到的列表的类型
 	 * @return
 	 */
-	public static <B, D> List<D> transOneListToAnoterList(List<B> one, Class<D> cla){
+	public static <B, D> List<D> transOneListToAnoterList(List<B> one, Class<D> cla) {
 		List<D> listD = new ArrayList<D>();
 		for (B b : one) {
 			D d = BeanAndDtoTransfer.transOneToAnother(b, cla);
@@ -67,14 +73,16 @@ public class BeanAndDtoTransfer {
 		}
 		return listD;
 	}
+
 	/**
 	 * 快捷复制对象到领一个对象 只能复制字段名相同的字段 底层使用copyProperties()
+	 * 
 	 * @author lonaking
 	 * @param bean
 	 * @param cla
 	 * @return
 	 */
-	public static <B ,D> D transOneToAnother(B bean, Class<D> cla){
+	public static <B, D> D transOneToAnother(B bean, Class<D> cla) {
 		try {
 			D dto = cla.newInstance();
 			BeanUtils.copyProperties(bean, dto);
@@ -84,47 +92,48 @@ public class BeanAndDtoTransfer {
 		}
 		return null;
 	}
-	
-	public static <B, D> D transOneToAnother(B bean, Class<D> cla, boolean camelUpperTrans){
-		try{
-			if(camelUpperTrans){
+
+	public static <B, D> D transOneToAnother(B bean, Class<D> cla, boolean camelUpperTrans) {
+		try {
+			if (camelUpperTrans) {
 				D dto = cla.newInstance();
 				transUpperLowerToCamel(bean, dto);
 				return dto;
-			}else{
+			} else {
 				return transOneToAnother(bean, cla);
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
-	public static <B, D> List<D> transOneListToAnoterList(List<B> one, Class<D> cla,boolean camelUpperTrans){
-		try{
-			if(camelUpperTrans){
+
+	public static <B, D> List<D> transOneListToAnoterList(List<B> one, Class<D> cla, boolean camelUpperTrans) {
+		try {
+			if (camelUpperTrans) {
 				List<D> listD = new ArrayList<D>();
 				for (B b : one) {
-					D d = BeanAndDtoTransfer.transOneToAnother(b, cla,true);
+					D d = BeanAndDtoTransfer.transOneToAnother(b, cla, true);
 					listD.add(d);
 				}
 				return listD;
-			}else{
+			} else {
 				return transOneListToAnoterList(one, cla);
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 转换下划线的model 到驼峰的model
+	 * 
 	 * @author lonaking
 	 * @param source
 	 * @param target
 	 */
-	private static void transUpperLowerToCamel(Object source, Object target){
+	private static void transUpperLowerToCamel(Object source, Object target) {
 		Assert.notNull(source, "Source must not be null");
 		Assert.notNull(target, "Target must not be null");
 
@@ -159,32 +168,31 @@ public class BeanAndDtoTransfer {
 
 		// 准备工作完成 开始重头戏
 		for (Field field : sourceField) {
-			try{
+			try {
 				String sourceName = field.getName(); // 属性名
 				String sourceStandardName = sourceStandardMap.get(sourceName);
 				Class tpye = field.getType(); // 属性类型
-				
-				String methodName = sourceName.substring(0, 1).toUpperCase()
-						+ sourceName.substring(1);
-				Method getMethod = sourceClass.getMethod("get" + methodName); // 拿到set方法 如果get方法不是标准驼峰  自己玩去吧
-				
+
+				String methodName = sourceName.substring(0, 1).toUpperCase() + sourceName.substring(1);
+				Method getMethod = sourceClass.getMethod("get" + methodName); // 拿到set方法
+																				// 如果get方法不是标准驼峰
+																				// 自己玩去吧
+
 				Object value = getMethod.invoke(source); // 执行source的get 拿到value
-				
+
 				for (Field f : targetField) {
 					String targetName = f.getName(); // 目标的属性名
-					String setTargetName = targetName.substring(0, 1).toUpperCase()
-							+ targetName.substring(1);
+					String setTargetName = targetName.substring(0, 1).toUpperCase() + targetName.substring(1);
 					String targetStandardName = targetStandardMap.get(targetName);
 					// 如果有重名,直接set
 					if (sourceStandardName.equals(targetStandardName)) {
-						Method setMethod = targetClass.getMethod("set"
-								+ setTargetName, tpye); // 目标属性的set方法
-						
+						Method setMethod = targetClass.getMethod("set" + setTargetName, tpye); // 目标属性的set方法
+
 						setMethod.invoke(target, value);// 写入
 					}
-					
+
 				}
-			}catch(Exception e){
+			} catch (Exception e) {
 				LOGGER.debug(e.getMessage());
 			}
 		}
